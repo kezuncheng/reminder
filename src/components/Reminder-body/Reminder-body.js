@@ -1,4 +1,5 @@
 import React from 'react';
+import FolderItem from '../Folder-item/Folder-item';
 import './r-body.styl';
 
 class ReminderBody extends React.Component {
@@ -8,8 +9,15 @@ class ReminderBody extends React.Component {
         <h1 className="r-title">文件夹</h1>
         <p className="folder-sub-title">KLOUD</p>
         <ul className="folder-list">
-          { this.props.folders.map((folder, index) => (
-            <li className="folder" key={ index }>{ folder.name }</li>
+          { this.props.folders.map((folder) => (
+            <FolderItem key={folder.id}
+                        folder={folder}
+                        editMode={this.props.editMode}
+                        selected={this.props.chosenFolders.includes(folder.id)}
+                        selectFolder={this.props.selectFolder}
+                        folderClick={this.props.folderClick}
+            />
+            // <li className="folder" key={ index }>{ folder.name }</li>
           )) }
         </ul>
       </div>

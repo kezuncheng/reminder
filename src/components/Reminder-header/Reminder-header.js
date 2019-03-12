@@ -6,7 +6,11 @@ class Header extends Component {
   render() {
     return (
       <div className="header">
-        <span className="edit right">编辑</span>
+        <span className="edit right" onClick={this.props.editRequest}>
+          {
+            this.props.editMode ? '完成' : '编辑'
+          }
+        </span>
       </div>
     );
   }

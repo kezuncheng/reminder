@@ -1,0 +1,36 @@
+@import '../../common/stylus/variable.styl';
+
+.folder
+  display flex
+  height 40px
+  line-height 40px
+  color $text-regular
+  &.selected
+    background #fffd96
+    .delete-btn
+      background yellow
+      border 1px solid yellow !important
+  .delete-folder
+    flex 0 0 40px
+    text-align center
+    max-width 40px
+    opacity 1
+    transition all 0.5s
+    overflow hidden
+    &.hide
+      max-width 0
+      opacity 0
+    .delete-btn
+      width 24px
+      height 24px
+      margin 0 auto
+      position relative
+      top 50%
+      transform translate(0, -50%)
+      border $border-regular
+      border-radius 50%
+      line-height 24px
+  .folder-name
+    flex 1 1
+    margin-left 10px
+    border-bottom $border-regular
