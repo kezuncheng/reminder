@@ -124,6 +124,27 @@ class App extends Component {
     }
   }
 
+  deleteFoldersConfirm() {
+    this.setState({
+      modalType: 'deleteFoldersConfirm',
+      showModal: true,
+    });
+  }
+
+  deleteFolders(deleteAll) {
+    if (deleteAll) {
+      console.log('全删');
+      this.setState({
+        showModal: false,
+      });
+    } else {
+      console.log('只删文件夹');
+      this.setState({
+        showModal: false,
+      });
+    }
+  }
+
   render() {
     return (
       <>
@@ -135,14 +156,17 @@ class App extends Component {
                       folderClick={this.folderClick}
         />
         <ReminderFooter addFolderRequest={this.addFolderRequest.bind(this)}
+                        deleteFoldersRequest={this.deleteFoldersConfirm.bind(this)}
                         editMode={this.state.editMode}
                         chosenFolders={this.state.chosenFolders}
         />
         <AddFolder showModal={this.state.showModal}
                    modalType={this.state.modalType}
+                   chosenFolders={this.state.chosenFolders}
                    ref={this.modal}
                    handleAddFolderOK={ this.handleAddFolderOK.bind(this) }
                    handleAddFolderCancel={this.handleAddFolderCancel.bind(this)}
+                   deleteRequest={this.deleteFolders.bind(this)}
         />
       </>
     );

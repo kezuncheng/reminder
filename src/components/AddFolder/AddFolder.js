@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, Input } from 'antd';
+import { Modal, Input, Button } from 'antd';
 import './add-folder.styl';
 
 class AddFolder extends React.Component {
@@ -28,7 +28,7 @@ class AddFolder extends React.Component {
       this.setState({
         folderName: '',
       });
-      this.input.current.input.value = '';
+      if (this.input.current) this.input.current.input.value = '';
     }, 40);
   }
 
@@ -62,19 +62,40 @@ class AddFolder extends React.Component {
     const type = this.props.modalType;
     if (type === 'addFolder') return '新建文件夹';
     if (type === 'editFolderName') return '修改文件夹名称';
+    if (type === 'deleteFoldersConfirm') return '删除文件夹？';
     return '';
   }
 
   render() {
+    const type = this.props.modalType;
     return (
       <Modal
         title={this.getTitle.bind(this)()}
         visible={this.props.showModal}
-        onOk={this.props.handleAddFolderOK}
         onCancel={this.props.handleAddFolderCancel}
-        okButtonProps={ { 'disabled': this.state.folderName.length === 0 }  }
+        // okButtonProps={ { 'disabled': this.state.folderName.length === 0 }  }
+        footer={type === 'deleteFoldersConfirm' ? [
+          <p key="0" className="delete-hint" onClick={this.props.deleteRequest.bind(this, true)}>删除文件夹和备忘录</p>,
+          <p key="1" className="delete-hint" onClick={this.props.deleteRequest.bind(this, false)}>仅删除文件夹</p>,
+          <p key="2" className="delete-hint cancel" onClick={this.props.handleAddFolderCancel}>取消</p>
+        ] :
+          [
+            <Button key="0" onClick={this.props.handleAddFolderCancel}>取消</Button>,
+            <Button key="1" disabled={this.state.folderName.length === 0}
+                    onClick={this.props.handleAddFolderOK}
+            >确认</Button>
+          ]
+        }
+        className={type === 'deleteFoldersConfirm' ? 'onDelete' : ''}
       >
-        <Input placeholder="名称" ref={this.input} onChange={this.handleChange.bind(this)} />
+        {
+          type === 'deleteFoldersConfirm' ?
+            <p>
+              如果仅删除这{ this.props.chosenFolders.length === 1 ? '一' : '些' }文件夹，其备忘录
+              将移至“备忘录”文件夹。子文件夹也将同时删除。
+            </p> :
+            <Input placeholder="名称" ref={this.input} onChange={this.handleChange.bind(this)} />
+        }
       </Modal>
     );
   }
