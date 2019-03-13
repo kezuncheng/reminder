@@ -5,6 +5,7 @@ class ReminderFooter extends Component {
 
   handleClick() {
     if (this.props.editMode) {
+      if (!this.props.chosenFolders.length) return;
       this.props.deleteFoldersRequest();
     } else {
       this.props.addFolderRequest();

@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
+import { message } from 'antd';
 import './App.styl';
 
 import ReminderHeader from './components/Reminder-header/Reminder-header';
 import ReminderFooter from './components/Reminder-footer/Reminder-footer';
 import ReminderBody from './components/Reminder-body/Reminder-body';
 import AddFolder from './components/AddFolder/AddFolder';
+
 import Store from 'store';
 
 class App extends Component {
@@ -18,6 +20,16 @@ class App extends Component {
     this.state = {
       showModal: false,
       folders: [],
+      defaultFolder: {
+        id: -1,
+        name: '备忘录',
+        files: [],
+      },
+      deletedFiles: {
+        id: -2,
+        name: '最近删除',
+        files: [],
+      },
       editMode: false,
       chosenFolders: [],
       modalType: 'addFolder',
@@ -27,9 +39,21 @@ class App extends Component {
 
   componentWillMount() {
     const folders = Store.get('reminderData');
+    const defaultFolder = Store.get('defaultFolder');
+    const deletedFiles = Store.get('deletedFiles');
     if (folders) {
       this.setState({
         folders,
+      });
+    }
+    if (defaultFolder) {
+      this.setState({
+        defaultFolder,
+      });
+    }
+    if (deletedFiles) {
+      this.setState({
+        deletedFiles,
       });
     }
   }
@@ -132,29 +156,64 @@ class App extends Component {
   }
 
   deleteFolders(deleteAll) {
+    let deleted = [];
+    const deletedFiles = this.state.deletedFiles;
+    const defaultFolder = this.state.defaultFolder;
+
+    const chosenFolders = this.state.chosenFolders;
+    const folders = this.state.folders;
+    const newFolders = folders.filter((folder) => {
+      if (chosenFolders.includes(folder.id)) {
+        deleted.push(...folder.files);
+        return false;
+      }
+      return true;
+    });
     if (deleteAll) {
-      console.log('全删');
-      this.setState({
-        showModal: false,
-      });
+      deletedFiles.files.push(...deleted);
+      Store.set('deletedFiles', deletedFiles);
     } else {
-      console.log('只删文件夹');
-      this.setState({
-        showModal: false,
-      });
+      defaultFolder.files.push(...deleted);
+      Store.set('defaultFolder', defaultFolder);
     }
+    // TODO setState 是异步？
+    this.setState({
+      showModal: false,
+      folders: newFolders,
+      deletedFiles,
+      defaultFolder,
+      chosenFolders: [],
+    }, () => {
+      this.updateStorage();
+      message.success('删除成功');
+    });
   }
 
   render() {
+    const allFileFolder = {
+      id: 0,
+      name: '所有kLoud',
+      files: [],
+    };
+    this.state.folders.forEach((folder) => {
+      if (folder.files.length) {
+        allFileFolder.files.push(...folder.files);
+      }
+    });
     return (
       <>
         <ReminderHeader editRequest={this.toggleEdit.bind(this)} editMode={this.state.editMode}/>
-        <ReminderBody folders={ this.state.folders }
-                      editMode={this.state.editMode}
-                      chosenFolders={this.state.chosenFolders}
-                      selectFolder={this.selectFolder}
-                      folderClick={this.folderClick}
-        />
+        <div className="body">
+          <ReminderBody folders={ this.state.folders }
+                        defaultFolder={this.state.defaultFolder}
+                        allFileFolder={allFileFolder}
+                        deletedFiles={this.state.deletedFiles}
+                        editMode={this.state.editMode}
+                        chosenFolders={this.state.chosenFolders}
+                        selectFolder={this.selectFolder}
+                        folderClick={this.folderClick}
+          />
+        </div>
         <ReminderFooter addFolderRequest={this.addFolderRequest.bind(this)}
                         deleteFoldersRequest={this.deleteFoldersConfirm.bind(this)}
                         editMode={this.state.editMode}
