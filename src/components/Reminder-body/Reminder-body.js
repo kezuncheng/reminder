@@ -5,8 +5,12 @@ import FolderDetail from '../Folder-detail/Folder-detail';
 
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
+import { connect } from 'react-redux';
+
 class ReminderBody extends React.Component {
   render() {
+    let { folders } = this.props;
+    console.log(folders);
     return (
       <Router>
         <div className="r-body">
@@ -51,4 +55,14 @@ class ReminderBody extends React.Component {
   }
 }
 
-export default ReminderBody;
+const mapStateToProps = (state) => {
+  return {
+    folders: state.folders,
+  };
+};
+
+const mapDispatchToProps = (dispatch, ownProps) => {
+  return {};
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(ReminderBody);

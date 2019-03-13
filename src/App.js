@@ -7,6 +7,9 @@ import ReminderFooter from './components/Reminder-footer/Reminder-footer';
 import ReminderBody from './components/Reminder-body/Reminder-body';
 import AddFolder from './components/AddFolder/AddFolder';
 
+import { connect } from 'react-redux';
+import { addFolder } from "./store/actions";
+
 import Store from 'store';
 
 class App extends Component {
@@ -19,7 +22,7 @@ class App extends Component {
     this.modal = React.createRef();
     this.state = {
       showModal: false,
-      folders: [],
+      // folders: [],
       defaultFolder: {
         id: -1,
         name: '备忘录',
@@ -38,14 +41,14 @@ class App extends Component {
   }
 
   componentWillMount() {
-    const folders = Store.get('reminderData');
+    // const folders = Store.get('reminderData');
     const defaultFolder = Store.get('defaultFolder');
     const deletedFiles = Store.get('deletedFiles');
-    if (folders) {
-      this.setState({
-        folders,
-      });
-    }
+    // if (folders) {
+    //   this.setState({
+    //     folders,
+    //   });
+    // }
     if (defaultFolder) {
       this.setState({
         defaultFolder,
@@ -56,6 +59,15 @@ class App extends Component {
         deletedFiles,
       });
     }
+  }
+
+  componentDidMount() {
+    const { addFolder } = this.props;
+    addFolder({
+      id: Date.now(),
+      name: '柯尊铖测试用',
+      files: []
+    });
   }
 
   addFolderRequest() {
@@ -190,12 +202,13 @@ class App extends Component {
   }
 
   render() {
+    let { folders } = this.props;
     const allFileFolder = {
       id: 0,
       name: '所有kLoud',
       files: [],
     };
-    this.state.folders.forEach((folder) => {
+    folders.forEach((folder) => {
       if (folder.files.length) {
         allFileFolder.files.push(...folder.files);
       }
@@ -204,7 +217,7 @@ class App extends Component {
       <>
         <ReminderHeader editRequest={this.toggleEdit.bind(this)} editMode={this.state.editMode}/>
         <div className="body">
-          <ReminderBody folders={ this.state.folders }
+          <ReminderBody folders={ folders }
                         defaultFolder={this.state.defaultFolder}
                         allFileFolder={allFileFolder}
                         deletedFiles={this.state.deletedFiles}
@@ -232,4 +245,17 @@ class App extends Component {
   }
 }
 
-export default App;
+const mapStateToProps = (state) => {
+  return {
+    folders: state.folders,
+  };
+};
+const mapDispatchToProps = (dispatch, ownProps) => {
+  return {
+    addFolder(data) {
+      dispatch(addFolder(data));
+    }
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
